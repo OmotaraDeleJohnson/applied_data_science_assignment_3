@@ -76,9 +76,9 @@ makeplot(df, "YR2019", "YR2020","red")
 # Extract X from world bank dataframe to perform  
 # K- means cluster using the elbow method
 ###############################
-def kMeansClusterUsingElbowMethod(df):
-    X = df[1:6].values
-    X
+X = df[1:6].values
+def kMeansClusterUsingElbowMethod(df,X):
+    
     
     #Performing my clustering using KMean(the elbow method) and AgglomerativeClustering to find the optimal number of clusters of the time and country series
     from sklearn.cluster import KMeans
@@ -93,40 +93,51 @@ def kMeansClusterUsingElbowMethod(df):
     plt.ylabel('WCSS')
     plt.show()
     
-kMeansClusterUsingElbowMethod(df)
+kMeansClusterUsingElbowMethod(df,X)
 
+#######################################################
 ##### set up agglomerative clustering for 5 clusters
-ac = cluster.AgglomerativeClustering(n_clusters=5)
-df_fit = df[["YR2015", "YR2016", "YR2017", "YR2018", "YR2019", "YR2020"]].copy()
-ac.fit(df_fit)
-plt.figure()
-labels = ac.labels_
-#compute the cluster centre
-xcen = []
-ycen = []
-for ic in range(6):
-    xc = np.average(df_fit["YR2015"][labels==ic])
-    yc = np.average(df_fit["YR2016"][labels==ic])
-    xcen.append(xc)
-    ycen.append(yc)
-# plot using the labels to select colour
-plt.figure(figsize=(5.0,5.0))
-plt.scatter(df_fit["YR2015"], df_fit["YR2016"], df_fit["YR2017"], c='magenta', label = 'Value cluster')
-# show cluster centres
-for ic in range(6):
-    plt.plot(xcen[ic], ycen[ic], "dk", markersize=8)    
-plt.xlabel("YR2015")
-plt.ylabel("YR2016")
-plt.show()
+#####################################################
+def agglomerativeClustering(df):
+    ac = cluster.AgglomerativeClustering(n_clusters=5)
+    df_fit = df[["YR2015", "YR2016", "YR2017", "YR2018", "YR2019", "YR2020"]].copy()
+    ac.fit(df_fit)
+    plt.figure()
+    labels = ac.labels_
+    #compute the cluster centre
+    xcen = []
+    ycen = []
+    for ic in range(6):
+        xc = np.average(df_fit["YR2015"][labels==ic])
+        yc = np.average(df_fit["YR2016"][labels==ic])
+        xcen.append(xc)
+        ycen.append(yc)
+    # plot using the labels to select colour
+    plt.figure(figsize=(5.0,5.0))
+    plt.scatter(df_fit["YR2015"], df_fit["YR2016"], df_fit["YR2017"], c='magenta', label = 'Value cluster')
+    # show cluster centres
+    for ic in range(6):
+        plt.plot(xcen[ic], ycen[ic], "dk", markersize=8)    
+    plt.xlabel("YR2015")
+    plt.ylabel("YR2016")
+    plt.show()
+    return df_fit
 
+df_fit = agglomerativeClustering(df)
 #Determine the curve fit
 from scipy.optimize import curve_fit
-import itertools as iter
 
 def func(X , a , b):
   return a+b*X
+
 popt , pcov = curve_fit(func , df_fit["YR2015"] , df_fit["YR2016"] )
 print(popt)
+
+#############################################
+# To calculate upper and lower limit for
+# a curve fit plot
+#############################################
+
 def err_ranges(x, func, param, sigma):    
 # initiate arrays for lower and upper limits
     lower = func(x, *param)
@@ -143,15 +154,23 @@ def err_ranges(x, func, param, sigma):
             lower = np.minimum(lower, y)
             upper = np.maximum(upper, y)
     return lower,upper
+
 lower_limit,upper_limit = err_ranges(X,func,popt,np.sum(X,axis=1))
 lower_limit,upper_limit
 
-fitting = np.arange(0.0,0.09,0.001)
-plt.plot(lower_limit, upper_limit,'r')
-plt.xlabel('lower Limit')
-plt.ylabel('Upper Limit')
-plt.title('Fit Curve')
-plt.show()
+##################################################
+# Graph to show the upper and lowe limit
+# limit boundaries for the year between 2015 - 2020
+###################################################
+
+def showlimitboundaries(lower_limit,upper_limit):
+    plt.plot(lower_limit, upper_limit,'r')
+    plt.xlabel('lower Limit')
+    plt.ylabel('Upper Limit')
+    plt.title('Fit Curve')
+    plt.show()
+    
+showlimitboundaries(lower_limit,upper_limit)
 
 ##Comparative Analysis was done considering grouping the country of consideration by continent and comparing their GDP per capital for relevant inferences
 
