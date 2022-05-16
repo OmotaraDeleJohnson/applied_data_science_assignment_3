@@ -5,7 +5,6 @@ Created on Wed Apr 27 14:32:14 2022
 
 @author: omotaradele-johnson
 """
-import pandas as pd
 import numpy as np
 import sklearn.cluster as cluster
 import matplotlib.pyplot as plt
@@ -172,58 +171,69 @@ def showlimitboundaries(lower_limit,upper_limit):
     
 showlimitboundaries(lower_limit,upper_limit)
 
-##Comparative Analysis was done considering grouping the country of consideration by continent and comparing their GDP per capital for relevant inferences
+##########################################################
+##Comparative Analysis was done considering grouping 
+#the country of consideration by continent and comparing 
+#their GDP per capital for relevant inferences
+##########################################################
 
 New_df = wb.data.DataFrame(indicator_Id, country_groups, mrv=6)
+
+#Renaming dataframe headers
 New_df = New_df.rename(columns={'YR2015':'2015', 'YR2016':'2016', 'YR2017':'2017', 'YR2018':'2018','YR2019':'2019', 'YR2020':'2020'}, inplace=False)
 
+# Compare all countries GDP per capita using 
+#ove the year 2015 - 2020
 New_df.transpose().plot(color=['#2a9d8f','#adc178','#a98467','#d4a373','#00eebb','#330077','#B0E0E6',
                                '#7B68EE','#ffc8dd','#a2d2ff','#e76f51','#2a9d8f','#264653','#6d6875',
                                '#b5838d','#e5989b'])
 
-fig, axes = plt.subplots(2, 2, figsize=(16, 8))
+#method to show the analysis between various continents
+def comparativeAnalysisAroundContinent(New_df):
+    fig, axes = plt.subplots(2, 2, figsize=(16, 8))
+    
+    #plotting a line graph for Africa Continent grouped countries
+    Africa = ['NGA', 'GHA', 'KEN', 'ZAF']
+    Afr_df = New_df.loc[Africa]
+    Afr_dft = Afr_df.transpose()
+    
+    Afr_dft.plot(ax=axes[0,0])
+    axes[0,0].set_title('Line Plot Africa countries')
+    axes[0,0].set_xlabel('year')
+    axes[0,0].set_ylabel('value')
+    
+    # Pass the axes into seaborn and Create the bar plot of European grouped countries
+    
+    Europe = ['BEL','ITA','GBR','FRA']
+    Eur_df = New_df.loc[Europe]
+    Eurp_dft = Eur_df.transpose()
+    
+    Eurp_dft.plot(kind='bar',color = ['#00eebb','#330077','#B0E0E6','#7B68EE'], ax=axes[0,1])
+    #Adding the aesthetics
+    axes[0,1].set_title('Bar Plot of European countries')
+    axes[0,1].set_xlabel('Year')
+    axes[0,1].set_ylabel('Value');
+    
+    #Creating a pie chart using the sume the North American grouped countries
+    North_America=['USA','MEX','CAN','JAM']
+    Na_df = New_df.loc[North_America]
+    
+    N_Amrc = Na_df.transpose()
+    axes[1,0].pie(N_Amrc.sum(), labels=North_America, colors = ['#2a9d8f','#adc178','#a98467','#d4a373'], autopct='%0.5f%%')
+    axes[1,0].set_title('Aggregated sum of the North America')
+    
+    #Creating a bar chart with the Asian grouped countries
+    
+    Asia = ['IND','PAK','JPN','CHN']
+    As_df = New_df.loc[Asia]
+    As_dft = As_df.transpose()
+    sns.barplot(data=As_dft, palette = "Oranges_r", ax=axes[1,1])
+    axes[1,1].set_title('Bar Plot of Asian countries')
+    axes[1,1].set_xlabel('X axis title')
+    axes[1,1].set_ylabel('Y axis title');
+    
+    plt.tight_layout(pad=2);
 
-#plotting a line graph for Africa Continent grouped countries
-Africa = ['NGA', 'GHA', 'KEN', 'ZAF']
-Afr_df = New_df.loc[Africa]
-Afr_dft = Afr_df.transpose()
-
-Afr_dft.plot(ax=axes[0,0])
-axes[0,0].set_title('Line Plot Africa countries')
-axes[0,0].set_xlabel('year')
-axes[0,0].set_ylabel('value')
-
-# Pass the axes into seaborn and Create the bar plot of European grouped countries
-
-Europe = ['BEL','ITA','GBR','FRA']
-Eur_df = New_df.loc[Europe]
-Eurp_dft = Eur_df.transpose()
-
-Eurp_dft.plot(kind='bar',color = ['#00eebb','#330077','#B0E0E6','#7B68EE'], ax=axes[0,1])
-#Adding the aesthetics
-axes[0,1].set_title('Bar Plot of European countries')
-axes[0,1].set_xlabel('Year')
-axes[0,1].set_ylabel('Value');
-
-#Creating a pie chart using the sume the North American grouped countries
-North_America=['USA','MEX','CAN','JAM']
-Na_df = New_df.loc[North_America]
-
-N_Amrc = Na_df.transpose()
-axes[1,0].pie(N_Amrc.sum(), labels=North_America, colors = ['#2a9d8f','#adc178','#a98467','#d4a373'], autopct='%0.5f%%')
-axes[1,0].set_title('Aggregated sum of the North America')
-
-#Creating a bar chart with the Asian grouped countries
-
-Asia = ['IND','PAK','JPN','CHN']
-As_df = New_df.loc[Asia]
-As_dft = As_df.transpose()
-sns.barplot(data=As_dft, palette = "Oranges_r", ax=axes[1,1])
-axes[1,1].set_title('Bar Plot of Asian countries')
-axes[1,1].set_xlabel('X axis title')
-axes[1,1].set_ylabel('Y axis title');
-
-plt.tight_layout(pad=2);
-
+comparativeAnalysisAroundContinent(New_df)
 
 
