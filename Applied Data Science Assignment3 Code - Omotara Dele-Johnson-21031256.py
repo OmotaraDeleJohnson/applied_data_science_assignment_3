@@ -33,7 +33,7 @@ country_groups = ({
     'USA': 'North America',
     'JAM': 'North America'
 })
-print(country_groups)
+
 df  = wb.data.DataFrame(indicator_Id, country_groups, mrv=6)
 print(df)
 
@@ -54,47 +54,46 @@ for col in df.columns[1:]:
 print(df.describe())
 df_plot = df.describe()
 
-def makeplot(df,col1, col2):
+def makeplot(df,col1, col2,color):
     plt.figure()
-    plt.scatter(df[col1], df[col2])
+    plt.scatter(df[col1], df[col2],c=color)
     plt.xlabel(col1)
     plt.ylabel(col2)
     plt.show()
-makeplot(df, "YR2015", "YR2016")
 
-def makeplot(df,col1, col2):
-    plt.figure()
-    plt.scatter(df[col1], df[col2], c = 'green')
-    plt.xlabel(col1)
-    plt.ylabel(col2)
-    plt.show()
+# Exploratory plot of two consecutive years 
+#across the data of consideration
+
+makeplot(df, "YR2015", "YR2016","blue")
+
 #without defining the makeplot the plts wont run
-makeplot(df, "YR2017", "YR2018")
+makeplot(df, "YR2017", "YR2018","green")
 
-def makeplot(df,col1, col2):
-    plt.figure()
-    plt.scatter(df[col1], df[col2], c = 'red')
-    plt.xlabel(col1)
-    plt.ylabel(col2)
-    plt.show()
 #without defining the makeplot the plts wont run
-makeplot(df, "YR2019", "YR2020")
+makeplot(df, "YR2019", "YR2020","red")
 
-X = df[1:6].values
-X
-
-#Performing my clustering using KMean(the elbow method) and AgglomerativeClustering to find the optimal number of clusters of the time and country series
-from sklearn.cluster import KMeans
-wcss = []
-for i in range(1, 6):
-    kmeans = KMeans(n_clusters = i, init = 'k-means++', random_state = 42)
-    kmeans.fit(X)
-    wcss.append(kmeans.inertia_)
-plt.plot(range(1, 6), wcss)
-plt.title('The Elbow Method')
-plt.xlabel('Number of clusters')
-plt.ylabel('WCSS')
-plt.show()
+################################################
+# Extract X from world bank dataframe to perform  
+# K- means cluster using the elbow method
+###############################
+def kMeansClusterUsingElbowMethod(df):
+    X = df[1:6].values
+    X
+    
+    #Performing my clustering using KMean(the elbow method) and AgglomerativeClustering to find the optimal number of clusters of the time and country series
+    from sklearn.cluster import KMeans
+    wcss = []
+    for i in range(1, 6):
+        kmeans = KMeans(n_clusters = i, init = 'k-means++', random_state = 42)
+        kmeans.fit(X)
+        wcss.append(kmeans.inertia_)
+    plt.plot(range(1, 6), wcss)
+    plt.title('The Elbow Method')
+    plt.xlabel('Number of clusters')
+    plt.ylabel('WCSS')
+    plt.show()
+    
+kMeansClusterUsingElbowMethod(df)
 
 ##### set up agglomerative clustering for 5 clusters
 ac = cluster.AgglomerativeClustering(n_clusters=5)
